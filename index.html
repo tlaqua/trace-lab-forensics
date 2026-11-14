@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TRACE LAB // Forensic Spatter &amp; Trajectory Studio</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-badge" aria-hidden="true">TL</div>
+      <div>
+        <h1>TRACE LAB <span class="subtitle">// Forensic Trajectory Studio</span></h1>
+        <p class="tagline">Physics, Geometry &amp; Objective Inquiry — Zero-Mess Virtual Simulation</p>
+      </div>
+    </div>
+
+    <div class="header-controls">
+      <button id="gradeToggle" class="pill-btn" title="Switch math &amp; reading level">
+        Level: <strong id="gradeLabel">Middle School</strong>
+      </button>
+      <button id="colorblindToggle" class="pill-btn" title="High-contrast colorblind safe palette">
+        High-Contrast: <strong id="cbLabel">OFF</strong>
+      </button>
+      <button id="glossaryBtn" class="pill-btn">Glossary (EN/ES)</button>
+    </div>
+  </header>
+
+  <nav class="module-nav" aria-label="Lab Modules">
+    <button class="nav-tab active" data-module="drop">1. Drop &amp; Surface Lab</button>
+    <button class="nav-tab" data-module="angle">2. Angle &amp; Direction</button>
+    <button class="nav-tab" data-module="string">3. 3D Red String Room</button>
+    <button class="nav-tab" data-module="motion">4. Drip Trails &amp; Energy</button>
+    <button class="nav-tab" data-module="ethics">5. Bias &amp; Ethics Lab</button>
+  </nav>
+
+  <main class="workspace">
+    <!-- MODULE 1: DROP & SURFACE LAB -->
+    <section id="mod-drop" class="module-panel active">
+      <div class="panel-grid">
+        <aside class="controls-card">
+          <h2>Drop &amp; Surface Sandbox</h2>
+          <p class="help-text">
+            Experiment with how drop height, simulant volume, and target surface texture affect stain diameter and edge spines.
+          </p>
+
+          <label class="control-group">
+            <span>Drop Height: <strong id="dropHeightVal">1.0 m</strong></span>
+            <input type="range" id="dropHeight" min="0.2" max="3.0" step="0.1" value="1.0" />
+          </label>
+
+          <label class="control-group">
+            <span>Target Surface Texture</span>
+            <select id="dropSurface">
+              <option value="glass">Smooth Glass / Tile</option>
+              <option value="drywall">Painted Drywall / Paper</option>
+              <option value="concrete">Rough Concrete</option>
+              <option value="fabric">Woven Cotton Fabric</option>
+            </select>
+          </label>
+
+          <label class="control-group">
+            <span>Droplet Volume: <strong id="dropVolumeVal">0.05 mL</strong></span>
+            <input type="range" id="dropVolume" min="0.03" max="0.10" step="0.01" value="0.05" />
+          </label>
+
+          <div class="btn-row">
+            <button id="btnSimulateDrop" class="primary-btn">Release Drop</button>
+            <button id="btnClearDrops" class="secondary-btn">Reset Target</button>
+          </div>
+
+          <div id="dropReadout" class="readout-box">
+            <strong>Lab Telemetry:</strong> Click "Release Drop" to observe impact physics.
+          </div>
+        </aside>
+
+        <div class="canvas-card">
+          <div class="canvas-header">
+            <span>Top-Down Microscopic View (Grid = 5 mm)</span>
+            <span class="badge">90° Passive Drip</span>
+          </div>
+          <canvas id="dropCanvas" width="760" height="460"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODULE 2: ANGLE & DIRECTION LAB -->
+    <section id="mod-angle" class="module-panel">
+      <div class="panel-grid">
+        <aside class="controls-card">
+          <h2>Angle &amp; Direction Lab</h2>
+          <p class="help-text">
+            Notice how shallow angles stretch circular drops into ellipses. The pointed tail always points in the <strong>direction of travel</strong>.
+          </p>
+
+          <label class="control-group">
+            <span>Impact Angle ($\theta$): <strong id="angleVal">45°</strong></span>
+            <input type="range" id="angleSlider" min="10" max="90" step="1" value="45" />
+          </label>
+
+          <label class="control-group">
+            <span>Travel Direction: <strong id="dirVal">0° (East)</strong></span>
+            <input type="range" id="dirSlider" min="0" max="355" step="5" value="0" />
+          </label>
+
+          <div class="btn-row">
+            <button id="angleModeChallenge" class="primary-btn">Generate Mystery Stain</button>
+          </div>
+
+          <div id="caliperReadout" class="readout-box">
+            <strong>Digital Calipers:</strong> Click and drag across the stain to measure Width &amp; Length.
+          </div>
+
+          <div class="guess-box">
+            <label class="control-group">
+              <span>Test Your Estimate (Angle in degrees):</span>
+              <div class="inline-row">
+                <input type="number" id="angleGuessInput" min="5" max="90" placeholder="e.g. 35" />
+                <button id="btnCheckAngleGuess" class="secondary-btn">Verify</button>
+              </div>
+            </label>
+            <div id="angleFeedback" class="feedback-line"></div>
+          </div>
+        </aside>
+
+        <div class="canvas-card">
+          <div class="canvas-header">
+            <span>Interactive Caliper Workbench (Drag across stain to measure)</span>
+            <span id="angleFormulaBadge" class="badge">Ratio Guide: Width ÷ Length</span>
+          </div>
+          <canvas id="angleCanvas" width="760" height="460"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODULE 3: 3D RED STRING ROOM -->
+    <section id="mod-string" class="module-panel">
+      <div class="panel-grid">
+        <aside class="controls-card">
+          <h2>3D Red String Room</h2>
+          <p class="help-text">
+            Drag the room to rotate in 3D. Click any stain to select it, then adjust or snap its string angle to locate the 3D <strong>Point of Origin</strong>.
+          </p>
+
+          <label class="control-group">
+            <span>Select Investigation / Sandbox</span>
+            <select id="sceneSelect">
+              <option value="case1">Case 01: Theater Prop Incident</option>
+              <option value="case2">Case 02: Midnight Bio-Simulant Spill</option>
+              <option value="case3">Case 03: Two-Event Reconstruction (Challenge)</option>
+              <option value="sandbox">What-If Sandbox (Custom Origin)</option>
+            </select>
+          </label>
+
+          <div id="sandboxOriginControls" class="sub-box hidden">
+            <strong>Custom Source (cm):</strong>
+            <label class="mini-range">X: <span id="sbXVal">0</span>
+              <input type="range" id="sbOriginX" min="-120" max="120" value="20" />
+            </label>
+            <label class="mini-range">Y: <span id="sbYVal">0</span>
+              <input type="range" id="sbOriginY" min="-120" max="120" value="-20" />
+            </label>
+            <label class="mini-range">Height Z: <span id="sbZVal">110</span>
+              <input type="range" id="sbOriginZ" min="15" max="190" value="110" />
+            </label>
+            <button id="btnGenerateSandbox" class="secondary-btn full-w">Generate Spatter Pattern</button>
+          </div>
+
+          <div id="selectedStainInfo" class="readout-box">
+            <strong>Selected Stain:</strong> None — click a droplet on the floor or wall.
+          </div>
+
+          <div class="sub-box">
+            <label class="control-group">
+              <span>String Direction (Azimuth): <strong id="stringAzimuthVal">0°</strong></span>
+              <input type="range" id="stringAzimuth" min="0" max="359" value="0" />
+            </label>
+            <label class="control-group">
+              <span>String Elevation Angle ($\theta$): <strong id="stringElevationVal">45°</strong></span>
+              <input type="range" id="stringElevation" min="5" max="85" value="45" />
+            </label>
+            <div class="btn-row">
+              <button id="btnAttachString" class="primary-btn">Attach / Update String</button>
+              <button id="btnSnapCalculated" class="secondary-btn">Snap to Measured $\theta$</button>
+            </div>
+            <div class="btn-row" style="margin-top:6px;">
+              <button id="btnRemoveString" class="secondary-btn">Remove Selected</button>
+              <button id="btnAutoStringAll" class="secondary-btn">String All</button>
+              <button id="btnClearStrings" class="secondary-btn">Clear All</button>
+            </div>
+          </div>
+
+          <div id="convergenceReadout" class="readout-box">
+            <strong>3D Convergence:</strong> Attach at least 2 strings to triangulate origin.
+          </div>
+
+          <div class="sub-box">
+            <label class="control-group">
+              <span>What-If Hypothesis Test:</span>
+              <div class="inline-row">
+                <select id="hypothesisSelect">
+                  <option value="standing">Standing (~145 cm)</option>
+                  <option value="kneeling">Kneeling / Crouched (~80 cm)</option>
+                  <option value="table">Lab Bench Height (~90 cm)</option>
+                  <option value="floor">Low / Floor Impact (~20 cm)</option>
+                </select>
+                <button id="btnTestHypothesis" class="secondary-btn">Test</button>
+              </div>
+            </label>
+            <div id="hypothesisFeedback" class="feedback-line"></div>
+          </div>
+        </aside>
+
+        <div class="canvas-card">
+          <div class="canvas-header">
+            <span>Interactive 3D Evidence Room (Drag to Orbit • Click Stains to String)</span>
+            <button id="btnResetCamera" class="mini-btn">Reset View</button>
+          </div>
+          <canvas id="stringCanvas" width="760" height="520"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODULE 4: MOTION & VELOCITY -->
+    <section id="mod-motion" class="module-panel">
+      <div class="panel-grid">
+        <aside class="controls-card">
+          <h2>Drip Trails &amp; Impact Energy</h2>
+          <p class="help-text">
+            Compare how walking vs. running alters drip spacing, or test how low, medium, and high kinetic energy change spatter droplet sizes.
+          </p>
+
+          <label class="control-group">
+            <span>Experiment Mode</span>
+            <select id="motionType">
+              <option value="drip">Moving Drip Trail (4-Meter Paper Roll)</option>
+              <option value="impact">Impact Velocity Comparison (Wall Target)</option>
+            </select>
+          </label>
+
+          <div id="dripControls">
+            <label class="control-group">
+              <span>Movement Speed: <strong id="walkSpeedVal">1.2 m/s (Walking)</strong></span>
+              <input type="range" id="walkSpeed" min="0" max="4.0" step="0.2" value="1.2" />
+            </label>
+          </div>
+
+          <div id="impactControls" class="hidden">
+            <label class="control-group">
+              <span>Impact Energy Level</span>
+              <select id="impactEnergy">
+                <option value="low">Low Velocity (Gravity Drip / Spill)</option>
+                <option value="medium">Medium Velocity (Blunt Lab Impact)</option>
+                <option value="high">High Velocity (Pressurized Mist Spray)</option>
+              </select>
+            </label>
+          </div>
+
+          <button id="btnRunMotion" class="primary-btn full-w">Run Simulation</button>
+
+          <div id="motionReadout" class="readout-box">
+            <strong>Pattern Notes:</strong> Adjust controls and run the simulation to compare evidence patterns.
+          </div>
+        </aside>
+
+        <div class="canvas-card">
+          <div class="canvas-header">
+            <span>Evidence Paper / Target Wall Capture</span>
+            <span class="badge">Motion &amp; Energy Lab</span>
+          </div>
+          <canvas id="motionCanvas" width="760" height="460"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODULE 5: BIAS & FORENSIC ETHICS LAB -->
+    <section id="mod-ethics" class="module-panel">
+      <div class="panel-grid">
+        <aside class="controls-card">
+          <h2>Bias &amp; Forensic Equity Lab</h2>
+          <p class="help-text">
+            Science serves justice only when investigators stay objective. Click stains on the map to include or exclude them, and see how <strong>Confirmation Bias</strong> can frame the wrong conclusion.
+          </p>
+
+          <div class="btn-row">
+            <button id="btnSelectBiased3" class="secondary-btn">Simulate "Hunch" (Pick 3)</button>
+            <button id="btnSelectAll8" class="primary-btn">Measure All 8 Stains</button>
+          </div>
+
+          <div id="biasReadout" class="readout-box">
+            <strong>Audit Result:</strong> Toggle stains on the floor plan to compare selective vs. complete data.
+          </div>
+
+          <div class="dei-cards">
+            <h3>Equity &amp; Diverse Pioneers in Forensics</h3>
+            <div class="mini-card">
+              <strong>Dr. Mae Jemison &amp; STEM Access</strong>
+              <p>Objective lab science relies on diverse perspectives questioning assumptions so communities are treated fairly.</p>
+            </div>
+            <div class="mini-card">
+              <strong>Dr. Henry Lee &amp; Pattern Standards</strong>
+              <p>Modern forensic standards demand reproducible math and peer review—never relying on an analyst's gut feeling alone.</p>
+            </div>
+            <div class="mini-card">
+              <strong>Why Math Protects Equity</strong>
+              <p>Historically, unverified forensic "hunches" contributed to wrongful convictions. Transparent geometry lets anyone audit the truth.</p>
+            </div>
+          </div>
+        </aside>
+
+        <div class="canvas-card">
+          <div class="canvas-header">
+            <span>Confirmation Bias Simulator (Click stains to toggle evidence inclusion)</span>
+            <span class="badge">Scientific Integrity</span>
+          </div>
+          <canvas id="biasCanvas" width="760" height="460"></canvas>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- GLOSSARY MODAL -->
+  <div id="glossaryModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="glossaryTitle">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="glossaryTitle">Forensic Glossary (English / Español)</h2>
+        <button id="closeGlossary" class="mini-btn">Close ✕</button>
+      </div>
+      <div class="glossary-list">
+        <div class="g-item"><strong>Angle of Impact (Ángulo de impacto):</strong> The acute angle at which a droplet strikes a surface ($\arcsin(W/L)$).</div>
+        <div class="g-item"><strong>Area of Convergence (Área de convergencia):</strong> The 2D location on a floor or wall where stain direction lines intersect.</div>
+        <div class="g-item"><strong>Point of Origin (Punto de origen):</strong> The 3D $(X, Y, Z)$ point in space where the spatter event occurred.</div>
+        <div class="g-item"><strong>Satellite Spatter (Salpicaduras satélite):</strong> Tiny secondary droplets formed around a main stain on rough surfaces or high impacts.</div>
+        <div class="g-item"><strong>Confirmation Bias (Sesgo de confirmación):</strong> Focusing only on evidence that supports a pre-existing belief while ignoring contradictory data.</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
